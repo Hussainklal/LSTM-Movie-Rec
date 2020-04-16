@@ -121,7 +121,7 @@ class LSTM_Movie_Rec:
     # Returns an ordered list of all movies from path
     def get_movies(self, path="./data/ml-1m/movies.dat"):
         movies_list = []
-        with open(path, "r") as f:
+        with open(path, encoding="ISO-8859-1") as f:
             lines = f.readlines()
             for line in lines:
                 _, movie, _ = line.split("::")
