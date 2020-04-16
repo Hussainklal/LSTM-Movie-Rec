@@ -90,7 +90,8 @@ input[type=submit] {
   <!-- Selected will be added here -->
   </ul>
   </div>
-  <button type="button" onclick="get_recs()" class="btn btn-primary">Get recommendations</button>
+  <button type="button" onclick="get_recs_lstm()" class="btn btn-primary">Get recommendations using LSTM</button>
+  <button type="button" onclick="get_recs_transformers()" class="btn btn-primary">Get recommendations using Transformers</button>
   <button type="button" onclick="reset_page()" class="btn btn-secondary">Reset</button>
 </div>
 <div class="col-sm">
@@ -226,7 +227,7 @@ function autocomplete(inp, arr) {
 }
 
 
-function get_recs() {
+function get_recs_lstm() {
   var res_con = document.getElementById("resultscontainer")
   res_con.innerHTML = ""
   g = document.createElement('div');
@@ -244,16 +245,54 @@ function get_recs() {
     }
 
     
-    handleRequest(movies_names_for_server)
+    handleRequestLstm(movies_names_for_server)
+  } catch (e) {
+    console.log(e);
+    alert("You need to select some movies first");
+  }
+}
+function get_recs_transformers() {
+  var res_con = document.getElementById("resultscontainer")
+  res_con.innerHTML = ""
+  g = document.createElement('div');
+  g.setAttribute("id", "movie_results");
+  g.setAttribute("class","list-group")
+  res_con.appendChild(g)
+  var movies = document.getElementById("selected_movies");
+  
+  var movies_names_for_server = [];
+  try {
+    
+    var items = movies.getElementsByTagName("li");
+    for (var i = 0; i < items.length; ++i) {
+      movies_names_for_server.push(items[i].getAttribute("id"));
+    }
+
+    
+    handleRequestTransformers(movies_names_for_server)
   } catch (e) {
     console.log(e);
     alert("You need to select some movies first");
   }
 }
 
-async function handleRequest(movies_names_for_server) {
+async function handleRequestLstm(movies_names_for_server) {
     // Async server GET
-    var resultsURL = "http://localhost:5000/results/" + JSON.stringify(movies_names_for_server);
+    var resultsURL = "http://localhost:5000/resultsLstm/" + JSON.stringify(movies_names_for_server);
+    let response = await fetch(resultsURL);
+    let data = await response.json()
+    
+    var results_ul = document.getElementById("movie_results");
+    for(var i=0; i<data.length; i++){
+      var li = document.createElement("li");
+      li.setAttribute("class", "list-group-item");
+      li.appendChild(document.createTextNode(data[i]));
+      results_ul.appendChild(li);
+    }
+}
+async function handleRequestTransformers(movies_names_for_server) {
+    // Async server GET
+    var resultsURL = "http://localhost:5000/resultsTransformers/" + JSON.stringify(movies_names_for_server);
     let response = await fetch(resultsURL);
     let data = await response.json()
     

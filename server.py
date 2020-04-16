@@ -15,14 +15,21 @@ from movies import LSTM_Movie_Rec
 
 app = Flask(__name__)
 
-
 @app.route('/', methods=['GET'])
 def hello_world():
     return render_template('index.html')
 
 
-@app.route('/results/<params>', methods=['GET'])
-def get_results(params):
+@app.route('/resultsLstm/<params>', methods=['GET'])
+def get_results_lstm(params):
+    print("Get results called", params)
+    movie_list = json.loads(params)
+    global my_model
+    result = my_model.top_k_movies(movie_list)
+    return jsonify(result)
+
+@app.route('/resultsTransformers/<params>', methods=['GET'])
+def get_results_transformers(params):
     print("Get results called", params)
     movie_list = json.loads(params)
     print(movie_list)
@@ -33,7 +40,6 @@ def get_results(params):
     # global my_model
     # result = my_model.top_k_movies(movie_list)
     return jsonify(result)
-
 
 my_model = None
 
